@@ -67,7 +67,7 @@ The function is authenticated (IAM) — not publicly accessible.
 | `PET_NAME` | No | First pet | Pet to monitor |
 | `CUTOFF_HOUR` | No | `1` | Stop checking at this hour (0-23) |
 | `POLL_INTERVAL_MINUTES` | No | `5` | Minutes between checks |
-| `LED_COLOR` | No | `0000FF` | Hex color for LED |
+| `LED_COLOR` | No | `4` | Fi color code (2=Red 3=Green 4=Blue 5=Purple 6=Yellow 7=Cyan 8=White) |
 | `STATE_FILE` | No | `state.json` | Local state file path |
 
 ## Battery Impact

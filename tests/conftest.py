@@ -14,7 +14,7 @@ def config():
         pet_name=None,
         cutoff_hour=1,
         poll_interval_minutes=5,
-        led_color="0000FF",
+        led_color=4,
         state_file="test_state.json",
         gcp_project_id=None,
         firestore_collection="test",

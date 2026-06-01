@@ -59,11 +59,15 @@ class TestIsActiveWindow:
 
 # --- check_and_toggle tests ---
 
-def _make_mock_fi(area_name="Some Street", base_names=None):
-    """Create mock Fi client and pet."""
+def _make_mock_fi(place_name="Some Street", base_names=None):
+    """Create mock Fi client and pet.
+
+    place_name maps to currPlaceName (Fi sets this to "Home" when in safe zone).
+    """
     mock_pet = MagicMock()
     mock_pet.name = "Buddy"
-    mock_pet.areaName = area_name
+    mock_pet.currPlaceName = place_name
+    mock_pet.areaName = None  # typically None in real API responses
     mock_pet.bases = []
     if base_names:
         for name in base_names:
@@ -90,7 +94,7 @@ class TestCheckAndToggle:
         assert result["outside"] is True
         assert state_off["led_on"] is True
         pet.turnOnOffLed.assert_called_once_with(fi.session, True)
-        pet.setLedColorCode.assert_called_once_with(fi.session, "0000FF")
+        pet.setLedColorCode.assert_called_once_with(fi.session, 4)
 
     @patch("fi_nightlight.check.connect_fi")
     def test_turns_off_when_inside(self, mock_connect, config, state_on):
@@ -142,7 +146,8 @@ class TestCheckAndToggle:
     @patch("fi_nightlight.check.connect_fi")
     def test_unknown_zone_skips_toggle(self, mock_connect, config, state_off):
         """When zone can't be determined, don't toggle."""
-        fi, pet = _make_mock_fi(None, [])  # no area, no bases
+        fi, pet = _make_mock_fi(None, [])  # no place name, no bases
+        pet.areaName = None
         mock_connect.return_value = (fi, pet)
         now = datetime(2026, 6, 15, 21, 0, tzinfo=TZ)
 

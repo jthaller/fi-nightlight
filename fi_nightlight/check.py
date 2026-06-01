@@ -38,32 +38,32 @@ def get_pet(fi: PyTryFi, pet_name: str | None):
 def is_outside_safe_zone(pet) -> bool | None:
     """Check if the pet is outside their safe zone.
 
+    Uses currPlaceName (which Fi sets to "Home" when in the safe zone)
+    as the primary signal. Falls back to areaName if available.
+
     Returns True (outside), False (inside), or None (can't determine).
     """
+    place = getattr(pet, "currPlaceName", None)
     area = getattr(pet, "areaName", None)
-    logger.info("Pet '%s' area: %s", pet.name, area)
+    logger.info("Pet '%s' place=%s, area=%s", pet.name, place, area)
 
-    if area is None:
-        logger.warning("Could not determine pet area (areaName is None)")
-        return None
+    # currPlaceName is the most reliable indicator from the Fi API
+    if place is not None:
+        if place == "Home":
+            return False  # inside safe zone
+        return True  # outside safe zone
 
-    # Check against known bases/zones
-    bases = getattr(pet, "bases", [])
-    base_names = [b.name for b in bases if hasattr(b, "name")]
-    logger.info("Known bases: %s", base_names)
+    # Fall back to areaName if currPlaceName is unavailable
+    if area is not None:
+        bases = getattr(pet, "bases", [])
+        base_names = [b.name for b in bases if hasattr(b, "name")]
+        if any(name == area for name in base_names):
+            return False
+        if base_names:
+            return True
 
-    for base_name in base_names:
-        if base_name == area:
-            return False  # inside a known zone
-
-    if not base_names:
-        logger.warning(
-            "No bases found for pet. Cannot determine zone status. "
-            "Area reported as: '%s'", area
-        )
-        return None
-
-    return True  # area doesn't match any known base
+    logger.warning("Could not determine zone status (place=%s, area=%s)", place, area)
+    return None
 
 
 def connect_fi(config: Config) -> tuple[PyTryFi, object]:

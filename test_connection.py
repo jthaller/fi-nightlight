@@ -43,18 +43,21 @@ def main():
     # Show location info
     print("\nFetching location...")
     pet.updatePetLocation(fi.session)
-    area = getattr(pet, "areaName", "unknown")
-    bases = [b.name for b in getattr(pet, "bases", []) if hasattr(b, "name")]
+    place = getattr(pet, "currPlaceName", "unknown")
+    address = getattr(pet, "currPlaceAddress", "unknown")
+    activity = getattr(pet, "activityType", "unknown")
     outside = is_outside_safe_zone(pet)
-    print(f"  Current area: {area}")
-    print(f"  Known bases: {bases}")
+    print(f"  Place: {place}")
+    print(f"  Address: {address}")
+    print(f"  Activity: {activity}")
     print(f"  Outside safe zone: {outside}")
 
     if args.led_on:
         print("\nTurning LED ON...")
         pet.turnOnOffLed(fi.session, True)
         pet.setLedColorCode(fi.session, config.led_color)
-        print(f"  Done (color: #{config.led_color})")
+        color_names = {2: "Red", 3: "Green", 4: "Blue", 5: "Purple", 6: "Yellow", 7: "Cyan", 8: "White"}
+        print(f"  Done (color: {color_names.get(config.led_color, config.led_color)})")
 
     elif args.led_off:
         print("\nTurning LED OFF...")
@@ -71,22 +74,22 @@ def main():
             for i in range(6):
                 pet.updatePetLocation(fi.session)
                 outside = is_outside_safe_zone(pet)
-                area = getattr(pet, "areaName", "unknown")
+                place = getattr(pet, "currPlaceName", "unknown")
 
                 if outside is None:
-                    print(f"  [{i+1}/6] Zone unknown ({area}) — skipping")
+                    print(f"  [{i+1}/6] Zone unknown ({place}) — skipping")
                 elif outside and not led_on:
-                    print(f"  [{i+1}/6] OUTSIDE ({area}) → LED ON")
+                    print(f"  [{i+1}/6] OUTSIDE ({place}) → LED ON")
                     pet.turnOnOffLed(fi.session, True)
                     led_on = True
                 elif not outside and led_on:
-                    print(f"  [{i+1}/6] INSIDE ({area}) → LED OFF")
+                    print(f"  [{i+1}/6] INSIDE ({place}) → LED OFF")
                     pet.turnOnOffLed(fi.session, False)
                     led_on = False
                 else:
                     status = "outside" if outside else "inside"
                     led_status = "on" if led_on else "off"
-                    print(f"  [{i+1}/6] {status} ({area}), LED {led_status} — no change")
+                    print(f"  [{i+1}/6] {status} ({place}), LED {led_status} — no change")
 
                 if i < 5:
                     time.sleep(30)
