@@ -21,9 +21,10 @@ gcloud functions deploy fi-nightlight \
   --gen2 \
   --runtime=python312 \
   --region="$REGION" \
-  --source=.. \
+  --source="$(cd "$(dirname "$0")/.." && pwd)" \
   --entry-point=fi_nightlight \
   --trigger-http \
+  --no-allow-unauthenticated \
   --set-env-vars="FI_USERNAME=${FI_USERNAME},FI_PASSWORD=${FI_PASSWORD},LATITUDE=${LATITUDE},LONGITUDE=${LONGITUDE},TIMEZONE=${TIMEZONE:-America/New_York},GCP_PROJECT_ID=${PROJECT_ID},FIRESTORE_COLLECTION=${FIRESTORE_COLLECTION:-fi_nightlight},CUTOFF_HOUR=${CUTOFF_HOUR:-1},POLL_INTERVAL_MINUTES=${POLL_INTERVAL_MINUTES:-5},LED_COLOR=${LED_COLOR:-4},PET_NAME=${PET_NAME:-}" \
   --project="$PROJECT_ID"
 
