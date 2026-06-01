@@ -1,0 +1,24 @@
+[project]
+name = "fi-nightlight"
+version = "0.1.0"
+description = "Auto-toggle Fi collar LED when your dog leaves the safe zone after sunset"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = [
+    "pytryfi>=0.0.19",
+    "astral>=3.2",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+local = ["APScheduler>=3.10,<4"]
+gcp = ["google-cloud-firestore>=2.11", "functions-framework>=3.0"]
+dev = ["pytest>=8.0", "freezegun>=1.2"]
+
+[tool.setuptools.packages.find]
+include = ["fi_nightlight*"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"

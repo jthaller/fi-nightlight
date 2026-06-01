@@ -1,0 +1,15 @@
+services:
+  fi-nightlight:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ../.env
+    environment:
+      - STATE_FILE=/data/state.json
+    volumes:
+      - fi-data:/data
+    restart: unless-stopped
+
+volumes:
+  fi-data:
