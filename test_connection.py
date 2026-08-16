@@ -55,9 +55,10 @@ def main():
     if args.led_on:
         print("\nTurning LED ON...")
         pet.turnOnOffLed(fi.session, True)
-        pet.setLedColorCode(fi.session, config.led_color)
+        color = config.led_colors[0]
+        pet.setLedColorCode(fi.session, color)
         color_names = {2: "Red", 3: "Green", 4: "Blue", 5: "Purple", 6: "Yellow", 7: "Cyan", 8: "White"}
-        print(f"  Done (color: {color_names.get(config.led_color, config.led_color)})")
+        print(f"  Done (color: {color_names.get(color, color)})")
 
     elif args.led_off:
         print("\nTurning LED OFF...")

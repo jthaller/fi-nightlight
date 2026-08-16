@@ -94,7 +94,7 @@ class TestCheckAndToggle:
         assert result["outside"] is True
         assert state_off["led_on"] is True
         pet.turnOnOffLed.assert_called_once_with(fi.session, True)
-        pet.setLedColorCode.assert_called_once_with(fi.session, 4)
+        pet.setLedColorCode.assert_called_once_with(fi.session, 2)  # first rainbow color (Red)
 
     @patch("fi_nightlight.check.connect_fi")
     def test_turns_off_when_inside(self, mock_connect, config, state_on):
@@ -110,7 +110,7 @@ class TestCheckAndToggle:
         pet.turnOnOffLed.assert_called_once_with(fi.session, False)
 
     @patch("fi_nightlight.check.connect_fi")
-    def test_no_toggle_when_already_correct(self, mock_connect, config, state_on):
+    def test_cycles_color_when_already_on(self, mock_connect, config, state_on):
         fi, pet = _make_mock_fi("Main Street", ["Home"])
         mock_connect.return_value = (fi, pet)
         now = datetime(2026, 6, 15, 21, 0, tzinfo=TZ)
@@ -119,6 +119,8 @@ class TestCheckAndToggle:
 
         assert result["led_on"] is True
         pet.turnOnOffLed.assert_not_called()
+        pet.setLedColorCode.assert_called_once_with(fi.session, 2)  # cycles to first color
+        assert state_on["color_index"] == 1  # advanced to next
 
     @patch("fi_nightlight.check.connect_fi")
     def test_turns_off_outside_window(self, mock_connect, config, state_on):
@@ -160,7 +162,7 @@ class TestCheckAndToggle:
     def test_multiple_trips(self, mock_connect, config):
         """Dog goes out, comes back, goes out again — LED toggles each time."""
         now = datetime(2026, 6, 15, 21, 0, tzinfo=TZ)
-        state = {"led_on": False, "last_checked": ""}
+        state = {"led_on": False, "last_checked": "", "color_index": 0}
 
         # Trip 1: dog goes outside
         fi, pet = _make_mock_fi("Park Ave", ["Home"])

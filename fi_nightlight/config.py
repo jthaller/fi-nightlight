@@ -2,6 +2,11 @@ import os
 from dataclasses import dataclass
 
 
+def _parse_led_colors(value: str) -> list[int]:
+    """Parse comma-separated color codes, e.g. '2,6,3,7,4,5'."""
+    return [int(c.strip()) for c in value.split(",")]
+
+
 @dataclass
 class Config:
     fi_username: str
@@ -12,7 +17,7 @@ class Config:
     pet_name: str | None
     cutoff_hour: int
     poll_interval_minutes: int
-    led_color: int
+    led_colors: list[int]
     state_file: str
     gcp_project_id: str | None
     firestore_collection: str
@@ -28,7 +33,7 @@ class Config:
             pet_name=os.environ.get("PET_NAME") or None,
             cutoff_hour=int(os.environ.get("CUTOFF_HOUR", "1")),
             poll_interval_minutes=int(os.environ.get("POLL_INTERVAL_MINUTES", "5")),
-            led_color=int(os.environ.get("LED_COLOR", "4")),
+            led_colors=_parse_led_colors(os.environ.get("LED_COLORS", os.environ.get("LED_COLOR", "2,6,3,7,4,5"))),
             state_file=os.environ.get("STATE_FILE", "state.json"),
             gcp_project_id=os.environ.get("GCP_PROJECT_ID") or None,
             firestore_collection=os.environ.get("FIRESTORE_COLLECTION", "fi_nightlight"),
