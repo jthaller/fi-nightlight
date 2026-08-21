@@ -17,6 +17,25 @@ gcloud services enable \
 
 # Deploy function (authenticated — no --allow-unauthenticated)
 echo "Deploying Cloud Function..."
+
+# Write env vars to a temp YAML file (avoids comma-delimiter conflicts with --set-env-vars)
+ENV_FILE=$(mktemp)
+trap "rm -f $ENV_FILE" EXIT
+cat > "$ENV_FILE" <<ENVEOF
+FI_USERNAME: "${FI_USERNAME}"
+FI_PASSWORD: "${FI_PASSWORD}"
+LATITUDE: "${LATITUDE}"
+LONGITUDE: "${LONGITUDE}"
+TIMEZONE: "${TIMEZONE:-America/New_York}"
+GCP_PROJECT_ID: "${PROJECT_ID}"
+FIRESTORE_COLLECTION: "${FIRESTORE_COLLECTION:-fi_nightlight}"
+CUTOFF_HOUR: "${CUTOFF_HOUR:-1}"
+POLL_INTERVAL_MINUTES: "${POLL_INTERVAL_MINUTES:-2}"
+SLOW_POLL_INTERVAL_MINUTES: "${SLOW_POLL_INTERVAL_MINUTES:-5}"
+LED_COLORS: "${LED_COLORS:-2,6,3,7,4,5}"
+PET_NAME: "${PET_NAME:-}"
+ENVEOF
+
 gcloud functions deploy fi-nightlight \
   --gen2 \
   --runtime=python312 \
@@ -26,7 +45,7 @@ gcloud functions deploy fi-nightlight \
   --trigger-http \
   --no-allow-unauthenticated \
   --memory=512MiB \
-  --set-env-vars="FI_USERNAME=${FI_USERNAME},FI_PASSWORD=${FI_PASSWORD},LATITUDE=${LATITUDE},LONGITUDE=${LONGITUDE},TIMEZONE=${TIMEZONE:-America/New_York},GCP_PROJECT_ID=${PROJECT_ID},FIRESTORE_COLLECTION=${FIRESTORE_COLLECTION:-fi_nightlight},CUTOFF_HOUR=${CUTOFF_HOUR:-1},POLL_INTERVAL_MINUTES=${POLL_INTERVAL_MINUTES:-5},LED_COLORS=${LED_COLORS:-2,6,3,7,4,5},PET_NAME=${PET_NAME:-}" \
+  --env-vars-file="$ENV_FILE" \
   --project="$PROJECT_ID"
 
 FUNCTION_URL=$(gcloud functions describe fi-nightlight --gen2 --region="$REGION" --project="$PROJECT_ID" --format='value(serviceConfig.uri)')
@@ -46,7 +65,7 @@ gcloud functions add-invoker-policy-binding fi-nightlight \
 # Create scheduler job (every 5 min, authenticated)
 echo "Creating Cloud Scheduler job..."
 gcloud scheduler jobs create http fi-nightlight-check \
-  --schedule="*/5 * * * *" \
+  --schedule="*/2 * * * *" \
   --uri="$FUNCTION_URL" \
   --http-method=GET \
   --oidc-service-account-email="$SA_EMAIL" \
@@ -54,7 +73,7 @@ gcloud scheduler jobs create http fi-nightlight-check \
   --location="$REGION" \
   --project="$PROJECT_ID" \
   2>/dev/null || gcloud scheduler jobs update http fi-nightlight-check \
-  --schedule="*/5 * * * *" \
+  --schedule="*/2 * * * *" \
   --uri="$FUNCTION_URL" \
   --http-method=GET \
   --oidc-service-account-email="$SA_EMAIL" \
@@ -65,4 +84,4 @@ gcloud scheduler jobs create http fi-nightlight-check \
 echo ""
 echo "Deployed!"
 echo "  Function: $FUNCTION_URL"
-echo "  Scheduler: every 5 min (function decides if it's active based on sunset)"
+echo "  Scheduler: every 2 min (throttled to 5 min when dog is inside)"

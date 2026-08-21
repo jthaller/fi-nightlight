@@ -28,7 +28,8 @@ def main():
     sunset, sunrise = get_sunset_sunrise(config.latitude, config.longitude, config.timezone)
     logger.info("Sunset tonight: %s", sunset.strftime("%I:%M %p"))
     logger.info("Sunrise tomorrow: %s", sunrise.strftime("%I:%M %p"))
-    logger.info("Checking every %d minutes, cutoff at %d:00", config.poll_interval_minutes, config.cutoff_hour)
+    logger.info("Checking every %d min (outside) / %d min (inside), cutoff at %d:00",
+                config.poll_interval_minutes, config.slow_poll_interval_minutes, config.cutoff_hour)
 
     def do_check():
         state = load_state()

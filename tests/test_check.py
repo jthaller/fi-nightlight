@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
 from zoneinfo import ZoneInfo
 
@@ -176,8 +176,9 @@ class TestCheckAndToggle:
         check_and_toggle(config, state, now=now)
         assert state["led_on"] is False
 
-        # Trip 2: dog goes outside again
+        # Trip 2: dog goes outside again (advance past slow poll interval)
+        now2 = now + timedelta(minutes=6)
         fi, pet = _make_mock_fi("Broadway", ["Home"])
         mock_connect.return_value = (fi, pet)
-        check_and_toggle(config, state, now=now)
+        check_and_toggle(config, state, now=now2)
         assert state["led_on"] is True

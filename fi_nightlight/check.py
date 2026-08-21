@@ -90,6 +90,15 @@ def check_and_toggle(config: Config, state: dict, now: datetime | None = None) -
             state["led_on"] = False
         return {"action": "inactive", "led_on": False}
 
+    # Throttle polling when dog is inside (LED off) — use slow interval
+    if not state["led_on"] and state.get("last_checked"):
+        last = datetime.fromisoformat(state["last_checked"])
+        elapsed = (now - last).total_seconds() / 60
+        if elapsed < config.slow_poll_interval_minutes:
+            logger.info("Dog inside, %.0fm since last check (slow interval %dm) — skipping",
+                        elapsed, config.slow_poll_interval_minutes)
+            return {"action": "throttled", "led_on": False}
+
     # In active window — check zone
     fi, pet = connect_fi(config)
     pet.updatePetLocation(fi.session)
