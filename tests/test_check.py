@@ -118,7 +118,7 @@ class TestCheckAndToggle:
         result = check_and_toggle(config, state_on, now=now)
 
         assert result["led_on"] is True
-        pet.turnOnOffLed.assert_not_called()
+        pet.turnOnOffLed.assert_called_once_with(fi.session, True)  # toggle to apply new color
         pet.setLedColorCode.assert_called_once_with(fi.session, 2)  # cycles to first color
         assert state_on["color_index"] == 1  # advanced to next
 
