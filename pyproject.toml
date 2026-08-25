@@ -13,7 +13,7 @@ dependencies = [
 
 [project.optional-dependencies]
 local = ["APScheduler>=3.10,<4"]
-gcp = ["google-cloud-firestore>=2.11", "functions-framework>=3.0"]
+gcp = ["google-cloud-firestore>=2.11,<2.20", "functions-framework>=3.0"]
 dev = ["pytest>=8.0", "freezegun>=1.2"]
 
 [tool.setuptools.packages.find]

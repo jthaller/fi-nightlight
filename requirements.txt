@@ -1,4 +1,4 @@
 pytryfi>=0.0.19
 astral>=3.2
 python-dotenv>=1.0
-google-cloud-firestore>=2.11
+google-cloud-firestore>=2.11,<2.20

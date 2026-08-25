@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+# Load .env file from project root
+ENV_PATH="$(cd "$(dirname "$0")/.." && pwd)/.env"
+if [ -f "$ENV_PATH" ]; then
+  set -a
+  source "$ENV_PATH"
+  set +a
+fi
+
 PROJECT_ID="${GCP_PROJECT_ID:?Set GCP_PROJECT_ID}"
 REGION="${GCP_REGION:-us-central1}"
 SA_NAME="fi-nightlight-invoker"
