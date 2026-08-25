@@ -116,6 +116,7 @@ def check_and_toggle(config: Config, state: dict, now: datetime | None = None) -
             logger.info("Dog OUTSIDE safe zone — turning LED ON (color %d)", color)
         else:
             logger.info("Dog OUTSIDE safe zone — cycling to color %d", color)
+            pet.turnOnOffLed(fi.session, False)  # toggle off first to force color change
         pet.setLedColorCode(fi.session, color)
         pet.turnOnOffLed(fi.session, True)
         state["led_on"] = True
