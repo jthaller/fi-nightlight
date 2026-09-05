@@ -40,7 +40,7 @@ FIRESTORE_COLLECTION: "${FIRESTORE_COLLECTION:-fi_nightlight}"
 CUTOFF_HOUR: "${CUTOFF_HOUR:-1}"
 POLL_INTERVAL_MINUTES: "${POLL_INTERVAL_MINUTES:-2}"
 SLOW_POLL_INTERVAL_MINUTES: "${SLOW_POLL_INTERVAL_MINUTES:-5}"
-LED_COLORS: "${LED_COLORS:-2,6,3,7,4,5}"
+LED_COLOR: "${LED_COLOR:-7}"
 PET_NAME: "${PET_NAME:-}"
 ENVEOF
 
@@ -92,4 +92,4 @@ gcloud scheduler jobs create http fi-nightlight-check \
 echo ""
 echo "Deployed!"
 echo "  Function: $FUNCTION_URL"
-echo "  Scheduler: every 2 min (throttled to 5 min when dog is inside)"
+echo "  Scheduler: every 2 min (throttled to ${SLOW_POLL_INTERVAL_MINUTES:-5} min when dog is inside)"

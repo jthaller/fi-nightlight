@@ -109,25 +109,18 @@ def check_and_toggle(config: Config, state: dict, now: datetime | None = None) -
         state["last_checked"] = now.isoformat()
         return {"action": "unknown_zone", "led_on": state["led_on"]}
 
-    if outside:
-        color_index = state.get("color_index", 0) % len(config.led_colors)
-        color = config.led_colors[color_index]
-        if not state["led_on"]:
-            logger.info("Dog OUTSIDE safe zone — turning LED ON (color %d)", color)
-        else:
-            logger.info("Dog OUTSIDE safe zone — cycling to color %d", color)
-            pet.turnOnOffLed(fi.session, False)  # toggle off first to force color change
-        pet.setLedColorCode(fi.session, color)
+    if outside and not state["led_on"]:
+        logger.info("Dog OUTSIDE safe zone — turning LED ON")
         pet.turnOnOffLed(fi.session, True)
+        pet.setLedColorCode(fi.session, config.led_color)
         state["led_on"] = True
-        state["color_index"] = (color_index + 1) % len(config.led_colors)
     elif not outside and state["led_on"]:
         logger.info("Dog INSIDE safe zone — turning LED OFF")
         pet.turnOnOffLed(fi.session, False)
         state["led_on"] = False
-        state["color_index"] = 0
     else:
-        logger.info("No change: inside, LED already off")
+        status = "outside, LED already on" if outside else "inside, LED already off"
+        logger.info("No change: %s", status)
 
     state["last_checked"] = now.isoformat()
     return {"action": "checked", "outside": outside, "led_on": state["led_on"]}

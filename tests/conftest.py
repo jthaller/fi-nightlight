@@ -15,7 +15,7 @@ def config():
         cutoff_hour=1,
         poll_interval_minutes=2,
         slow_poll_interval_minutes=5,
-        led_colors=[2, 6, 3, 7, 4, 5],
+        led_color=7,
         state_file="test_state.json",
         gcp_project_id=None,
         firestore_collection="test",
@@ -24,9 +24,9 @@ def config():
 
 @pytest.fixture
 def state_off():
-    return {"led_on": False, "last_checked": "", "color_index": 0}
+    return {"led_on": False, "last_checked": ""}
 
 
 @pytest.fixture
 def state_on():
-    return {"led_on": True, "last_checked": "", "color_index": 0}
+    return {"led_on": True, "last_checked": ""}

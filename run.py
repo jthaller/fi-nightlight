@@ -30,6 +30,7 @@ def main():
     logger.info("Sunrise tomorrow: %s", sunrise.strftime("%I:%M %p"))
     logger.info("Checking every %d min (outside) / %d min (inside), cutoff at %d:00",
                 config.poll_interval_minutes, config.slow_poll_interval_minutes, config.cutoff_hour)
+    logger.info("LED color: %d", config.led_color)
 
     def do_check():
         state = load_state()

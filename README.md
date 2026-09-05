@@ -66,8 +66,9 @@ The function is authenticated (IAM) — not publicly accessible.
 | `TIMEZONE` | No | `America/New_York` | IANA timezone |
 | `PET_NAME` | No | First pet | Pet to monitor |
 | `CUTOFF_HOUR` | No | `1` | Stop checking at this hour (0-23) |
-| `POLL_INTERVAL_MINUTES` | No | `5` | Minutes between checks |
-| `LED_COLOR` | No | `4` | Fi color code (2=Red 3=Green 4=Blue 5=Purple 6=Yellow 7=Cyan 8=White) |
+| `POLL_INTERVAL_MINUTES` | No | `2` | Minutes between checks (when outside) |
+| `SLOW_POLL_INTERVAL_MINUTES` | No | `5` | Minutes between checks (when inside) |
+| `LED_COLOR` | No | `7` | Fi color code (2=Red 3=Green 4=Blue 5=Purple 6=Yellow 7=Cyan 8=White) |
 | `STATE_FILE` | No | `state.json` | Local state file path |
 
 ## Battery Impact

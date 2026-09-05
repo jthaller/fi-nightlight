@@ -5,7 +5,7 @@ from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_STATE = {"led_on": False, "last_checked": "", "color_index": 0}
+DEFAULT_STATE = {"led_on": False, "last_checked": ""}
 
 
 def load_state() -> dict:
