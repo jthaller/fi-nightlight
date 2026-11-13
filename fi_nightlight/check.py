@@ -36,28 +36,26 @@ def get_pet(fi: PyTryFi, pet_name: str | None):
 
 
 def is_outside_safe_zone(pet) -> bool | None:
-    """Check if the pet is outside their safe zone.
+    """Check if the pet is outside any safe zone (base).
 
-    Uses currPlaceName (which Fi sets to "Home" when in the safe zone)
-    as the primary signal. Falls back to areaName if available.
-
+    Checks currPlaceName and areaName against the pet's configured bases.
     Returns True (outside), False (inside), or None (can't determine).
     """
     place = getattr(pet, "currPlaceName", None)
     area = getattr(pet, "areaName", None)
-    logger.info("Pet '%s' place=%s, area=%s", pet.name, place, area)
+    bases = getattr(pet, "bases", [])
+    base_names = {b.name for b in bases if hasattr(b, "name")}
+    logger.info("Pet '%s' place=%s, area=%s, bases=%s", pet.name, place, area, base_names)
 
-    # currPlaceName is the most reliable indicator from the Fi API
+    # Check currPlaceName against all known bases (includes "Home")
     if place is not None:
-        if place == "Home":
-            return False  # inside safe zone
-        return True  # outside safe zone
+        if place in base_names:
+            return False  # inside a safe zone
+        return True  # outside all safe zones
 
     # Fall back to areaName if currPlaceName is unavailable
     if area is not None:
-        bases = getattr(pet, "bases", [])
-        base_names = [b.name for b in bases if hasattr(b, "name")]
-        if any(name == area for name in base_names):
+        if area in base_names:
             return False
         if base_names:
             return True

@@ -40,7 +40,7 @@ FIRESTORE_COLLECTION: "${FIRESTORE_COLLECTION:-fi_nightlight}"
 CUTOFF_HOUR: "${CUTOFF_HOUR:-1}"
 POLL_INTERVAL_MINUTES: "${POLL_INTERVAL_MINUTES:-2}"
 SLOW_POLL_INTERVAL_MINUTES: "${SLOW_POLL_INTERVAL_MINUTES:-5}"
-LED_COLOR: "${LED_COLOR:-7}"
+LED_COLOR: "${LED_COLOR:-5}"
 PET_NAME: "${PET_NAME:-}"
 ENVEOF
 
@@ -73,7 +73,7 @@ gcloud functions add-invoker-policy-binding fi-nightlight \
 # Create scheduler job (every 5 min, authenticated)
 echo "Creating Cloud Scheduler job..."
 gcloud scheduler jobs create http fi-nightlight-check \
-  --schedule="*/2 * * * *" \
+  --schedule="*/5 * * * *" \
   --uri="$FUNCTION_URL" \
   --http-method=GET \
   --oidc-service-account-email="$SA_EMAIL" \
@@ -81,7 +81,7 @@ gcloud scheduler jobs create http fi-nightlight-check \
   --location="$REGION" \
   --project="$PROJECT_ID" \
   2>/dev/null || gcloud scheduler jobs update http fi-nightlight-check \
-  --schedule="*/2 * * * *" \
+  --schedule="*/5 * * * *" \
   --uri="$FUNCTION_URL" \
   --http-method=GET \
   --oidc-service-account-email="$SA_EMAIL" \
@@ -92,4 +92,4 @@ gcloud scheduler jobs create http fi-nightlight-check \
 echo ""
 echo "Deployed!"
 echo "  Function: $FUNCTION_URL"
-echo "  Scheduler: every 2 min (throttled to ${SLOW_POLL_INTERVAL_MINUTES:-5} min when dog is inside)"
+echo "  Scheduler: every 5 min (throttled to ${SLOW_POLL_INTERVAL_MINUTES:-6} min when dog is inside)"

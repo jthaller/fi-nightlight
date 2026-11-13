@@ -94,7 +94,7 @@ class TestCheckAndToggle:
         assert result["outside"] is True
         assert state_off["led_on"] is True
         pet.turnOnOffLed.assert_called_once_with(fi.session, True)
-        pet.setLedColorCode.assert_called_once_with(fi.session, 7)  # cyan
+        pet.setLedColorCode.assert_called_once_with(fi.session, 5)  # magenta
 
     @patch("fi_nightlight.check.connect_fi")
     def test_turns_off_when_inside(self, mock_connect, config, state_on):
@@ -155,6 +155,19 @@ class TestCheckAndToggle:
 
         assert result["action"] == "unknown_zone"
         pet.turnOnOffLed.assert_not_called()
+
+    @patch("fi_nightlight.check.connect_fi")
+    def test_turns_off_at_named_safe_zone(self, mock_connect, config, state_on):
+        """Dog at a non-Home base (e.g. 'Grandma's') should be treated as inside."""
+        fi, pet = _make_mock_fi("Grandma's", ["Home", "Grandma's"])
+        mock_connect.return_value = (fi, pet)
+        now = datetime(2026, 6, 15, 21, 0, tzinfo=TZ)
+
+        result = check_and_toggle(config, state_on, now=now)
+
+        assert result["led_on"] is False
+        assert result["outside"] is False
+        pet.turnOnOffLed.assert_called_once_with(fi.session, False)
 
     @patch("fi_nightlight.check.connect_fi")
     def test_multiple_trips(self, mock_connect, config):
